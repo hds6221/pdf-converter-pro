@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Lock, Plus, CheckCircle, Shield, ShieldCheck, BookOpen, AlertTriangle } from 'lucide-react';
-import axios from 'axios';
+import { X, Lock, Plus, CheckCircle, Shield, ShieldCheck, BookOpen, AlertTriangle, MessageSquare } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
-// Interfaces for Type Safety
+// Interfaces for Type Safety (Supabase Schema Match)
 interface Inquiry {
     id: string;
     title: string;
     content: string;
     author: string;
     password?: string;
-    isSecret: boolean;
-    createdAt: string;
+    is_secret: boolean;
+    created_at: string; // ISO String from Supabase
     status: 'pending' | 'answered';
     reply: string | null;
 }
@@ -33,20 +33,19 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
     // Reply State
     const [replyContent, setReplyContent] = useState('');
 
-    const API_URL = 'http://localhost:3001/inquiries';
-
     useEffect(() => {
         fetchInquiries();
     }, []);
 
     const fetchInquiries = async () => {
         try {
-            const res = await axios.get(API_URL);
-            // Sort by createdAt desc
-            const sorted = res.data.sort((a: Inquiry, b: Inquiry) =>
-                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-            setInquiries(sorted);
+            const { data, error } = await supabase
+                .from('inquiries')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            setInquiries(data || []);
         } catch (error) {
             console.error('Failed to fetch inquiries', error);
         } finally {
@@ -61,39 +60,63 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
             content: newContent,
             author: newAuthor,
             password: newPassword,
-            isSecret,
-            createdAt: new Date().toISOString(),
-            status: 'pending' as const,
+            is_secret: isSecret,
+            status: 'pending',
             reply: null
         };
 
         try {
-            await axios.post(API_URL, newInquiry);
+            const { error } = await supabase.from('inquiries').insert([newInquiry]);
+            if (error) throw error;
+
             setIsWriteMode(false);
             resetForm();
             fetchInquiries();
         } catch (error) {
-            alert('서버에 연결할 수 없습니다. 터미널에서 "npm run dev:full"이 실행 중인지 확인해주세요.');
+            alert('문의 등록에 실패했습니다. 잠시 후 다시 시도해주세요.');
             console.error(error);
         }
     };
 
     const handleReply = async () => {
         if (!selectedInquiry) return;
-        const updated: Inquiry = { ...selectedInquiry, reply: replyContent, status: 'answered' };
-        await axios.put(`${API_URL}/${selectedInquiry.id}`, updated);
-        setSelectedInquiry(updated);
-        setReplyContent('');
-        fetchInquiries();
+        try {
+            const { error } = await supabase
+                .from('inquiries')
+                .update({ reply: replyContent, status: 'answered' })
+                .eq('id', selectedInquiry.id);
+
+            if (error) throw error;
+
+            const updated = { ...selectedInquiry, reply: replyContent, status: 'answered' as const };
+            setSelectedInquiry(updated);
+            setReplyContent('');
+            fetchInquiries();
+        } catch (error) {
+            alert('답변 등록 실패');
+            console.error(error);
+        }
     };
 
     const handleDeleteReply = async () => {
         if (!selectedInquiry) return;
         if (!confirm('정말 답변을 삭제하시겠습니까?')) return;
-        const updated: Inquiry = { ...selectedInquiry, reply: null, status: 'pending' };
-        await axios.put(`${API_URL}/${selectedInquiry.id}`, updated);
-        setSelectedInquiry(updated);
-        fetchInquiries();
+
+        try {
+            const { error } = await supabase
+                .from('inquiries')
+                .update({ reply: null, status: 'pending' })
+                .eq('id', selectedInquiry.id);
+
+            if (error) throw error;
+
+            const updated = { ...selectedInquiry, reply: null, status: 'pending' as const };
+            setSelectedInquiry(updated);
+            fetchInquiries();
+        } catch (error) {
+            alert('답변 삭제 실패');
+            console.error(error);
+        }
     };
 
     const handleDeleteInquiry = async () => {
@@ -109,9 +132,16 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
             }
         }
 
-        await axios.delete(`${API_URL}/${selectedInquiry.id}`);
-        setSelectedInquiry(null);
-        fetchInquiries();
+        try {
+            const { error } = await supabase.from('inquiries').delete().eq('id', selectedInquiry.id);
+            if (error) throw error;
+
+            setSelectedInquiry(null);
+            fetchInquiries();
+        } catch (error) {
+            alert('삭제 실패');
+            console.error(error);
+        }
     };
 
     const resetForm = () => {
@@ -123,7 +153,7 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
     };
 
     const handleInquiryClick = (inquiry: Inquiry) => {
-        if (inquiry.isSecret && !isAdmin) {
+        if (inquiry.is_secret && !isAdmin) {
             const inputPwd = prompt('비밀글입니다. 비밀번호를 입력해주세요.');
             if (inputPwd !== inquiry.password) {
                 alert('비밀번호가 일치하지 않습니다.');
@@ -220,31 +250,57 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
 
                                 {/* List Container - Removing inner scroll and fixed height for natural scrolling */}
                                 <div className="space-y-3">
-                                    {loading ? <p className="text-center py-10 text-slate-500">불러오는 중...</p> : inquiries.map((item) => (
+                                    {loading ? (
+                                        <div className="flex justify-center items-center py-20">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#66FCF1]"></div>
+                                        </div>
+                                    ) : inquiries.length === 0 ? (
                                         <motion.div
-                                            key={item.id}
-                                            onClick={() => handleInquiryClick(item)}
-                                            className={`p-5 rounded-xl bg-[#1F2833]/30 border border-[#45A29E]/10 cursor-pointer hover:bg-[#1F2833] hover:border-[#66FCF1]/30 transition-all group ${selectedInquiry?.id === item.id ? 'border-[#66FCF1] bg-[#1F2833]' : ''}`}
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            className="flex flex-col items-center justify-center py-16 text-center bg-[#1F2833]/30 rounded-xl border border-dashed border-slate-700"
                                         >
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div className="flex items-center gap-2">
-                                                    {item.isSecret && <Lock size={14} className="text-[#FF6B6B]" />}
-                                                    <span className={`font-bold text-lg ${item.isSecret && !isAdmin ? 'text-slate-500' : 'text-white'}`}>
-                                                        {item.isSecret && !isAdmin ? '비밀글입니다.' : item.title}
-                                                    </span>
-                                                </div>
-                                                {item.status === 'answered' ? (
-                                                    <span className="text-[#66FCF1] text-xs font-bold px-2 py-1 bg-[#66FCF1]/10 rounded border border-[#66FCF1]/30">답변완료</span>
-                                                ) : (
-                                                    <span className="text-slate-500 text-xs font-bold px-2 py-1 bg-slate-800 rounded border border-slate-700">대기중</span>
-                                                )}
+                                            <div className="w-16 h-16 bg-[#1F2833] rounded-full flex items-center justify-center mb-4 text-slate-500">
+                                                <MessageSquare size={32} />
                                             </div>
-                                            <div className="flex justify-between text-sm text-slate-500">
-                                                <span>{item.author}</span>
-                                                <span>{new Date(item.createdAt).toLocaleDateString()}</span>
-                                            </div>
+                                            <h4 className="text-lg font-bold text-white mb-2">등록된 문의가 없습니다</h4>
+                                            <p className="text-slate-500 text-sm mb-6 max-w-[250px]">
+                                                궁금한 점이나 건의사항이 있으신가요?<br />
+                                                첫 번째 문의를 남겨보세요!
+                                            </p>
+                                            <button
+                                                onClick={() => { setIsWriteMode(true); setSelectedInquiry(null); }}
+                                                className="px-5 py-2 bg-[#66FCF1]/10 hover:bg-[#66FCF1]/20 text-[#66FCF1] border border-[#66FCF1]/50 rounded-lg text-sm font-bold transition-all"
+                                            >
+                                                문의 작성하기
+                                            </button>
                                         </motion.div>
-                                    ))}
+                                    ) : (
+                                        inquiries.map((item) => (
+                                            <motion.div
+                                                key={item.id}
+                                                onClick={() => handleInquiryClick(item)}
+                                                className={`p-5 rounded-xl bg-[#1F2833]/30 border border-[#45A29E]/10 cursor-pointer hover:bg-[#1F2833] hover:border-[#66FCF1]/30 transition-all group ${selectedInquiry?.id === item.id ? 'border-[#66FCF1] bg-[#1F2833]' : ''}`}
+                                            >
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div className="flex items-center gap-2">
+                                                        {item.is_secret && <Lock size={14} className="text-[#FF6B6B]" />}
+                                                        <span className={`font-bold text-lg ${item.is_secret && !isAdmin ? 'text-slate-500' : 'text-white'}`}>
+                                                            {item.is_secret && !isAdmin ? '비밀글입니다.' : item.title}
+                                                        </span>
+                                                    </div>
+                                                    {item.status === 'answered' ? (
+                                                        <span className="text-[#66FCF1] text-xs font-bold px-2 py-1 bg-[#66FCF1]/10 rounded border border-[#66FCF1]/30">답변완료</span>
+                                                    ) : (
+                                                        <span className="text-slate-500 text-xs font-bold px-2 py-1 bg-slate-800 rounded border border-slate-700">대기중</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex justify-between text-sm text-slate-500">
+                                                    <span>{item.author}</span>
+                                                    <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                                                </div>
+                                            </motion.div>
+                                        )))}
                                 </div>
                             </div>
                         )}
@@ -325,11 +381,11 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
                                     <div className="flex items-start justify-between gap-4">
                                         <div className="flex flex-col gap-2">
                                             <div className="flex items-center gap-2">
-                                                {selectedInquiry.isSecret && <Lock size={16} className="text-[#FF6B6B]" />}
+                                                {selectedInquiry.is_secret && <Lock size={16} className="text-[#FF6B6B]" />}
                                                 <span className="text-xs font-bold text-[#66FCF1] px-2 py-1 bg-[#66FCF1]/10 rounded border border-[#66FCF1]/20">
                                                     {selectedInquiry.status === 'answered' ? '답변완료' : '대기중'}
                                                 </span>
-                                                <span className="text-xs text-slate-500">{new Date(selectedInquiry.createdAt).toLocaleString()}</span>
+                                                <span className="text-xs text-slate-500">{new Date(selectedInquiry.created_at).toLocaleString()}</span>
                                             </div>
                                             <h3 className="text-2xl font-bold text-white leading-relaxed">{selectedInquiry.title}</h3>
                                         </div>
