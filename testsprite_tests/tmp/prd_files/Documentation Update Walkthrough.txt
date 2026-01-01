@@ -1,0 +1,47 @@
+PDF AUTO Website Debugging Checklist
+Based on the analysis of your React/Vite project (pdf_auto_web), here is a detailed list of areas to debug and improve. This list avoids generic advice and focuses on your specific codebase.
+
+1. Visual & UI Consistency
+ Responsive Navigation: Check that the navbar behaves correctly on mobile. The "Usage Guide" and "Download" buttons are currently hidden on small screens (hidden md:flex). Ensure there is a way to access them (e.g., a hamburger menu) or that it is intentional.
+ Hero Text Breaking: The br className="hidden md:block" in the H1 tag affects how the title "Professional Batch / PDF Converter" wraps. Verify it looks good on tablet sizes (e.g., iPad Air).
+ Grid Layouts:
+Features Section: grid md:grid-cols-3 switches from 1 column to 3 columns. Check if the cards look too wide on intermediate screens (600px-768px). Use Chrome DevTools Device Mode for this.
+UI Legend: grid-cols-2 md:grid-cols-5. Check the alignment when there is an uneven number of items in the 2-column view (5 items total means the last row will have 1 item).
+2. Asset & Media Validation
+ Image Loading: You are referencing images like 
+/assets/step1_setup_1767147651170.png
+.
+Verify these files exist in public/assets/ (Confirmed during analysis).
+Debugging: Open the Network tab in DevTools, disable cache, and reload. Check for 404s or slow load times.
+ Image Quality vs. Size: The screenshot images are PNGs. Check their file size. If they are >500KB, consider converting to WebP or compressing them (tinypng.com) to improve load speed.
+ Alt Text: The alt text "App Screenshot" (line 78) could be more descriptive for accessibility (e.g., "PDF Auto Main Interface Screenshot").
+3. Functionality & Interaction
+ Smooth Scrolling: The links href="#features" and href="#guide" rely on default browser anchor behavior.
+Debugging: Click them and ensure the navbar doesn't cover the section title. You might need scroll-padding-top in your CSS (e.g., html { scroll-behavior: smooth; scroll-padding-top: 5rem; } in 
+index.css
+).
+ External Links:
+The download button (line 35) opens https://github.com/your-repo/releases. Critical: Ensure this URL is updated to your actual repo URL.
+The "Support" link in the footer legend (line 175) is static text. Should it link somewhere?
+4. Code & Implementation Details
+ Hardcoded Strings: The version "v1.0.0" is hardcoded in multiple places (Hero badge, Navbar, Footer).
+Suggestion: Move this to a constant file (src/constants.ts) so you don't update one and forget the others.
+ Console Errors: Open the browser console. Check for unique key warnings in your .map loops (looks okay in 
+App.tsx
+ using idx, but good to verify).
+5. SEO & Metadata (Critical for a Landing Page)
+ Missing Meta Tags: Your 
+index.html
+ has a default title <title>pdf_auto_web</title> and no <meta name="description">.
+Action: Update title to "PDF AUTO - Batch Excel to PDF Converter".
+Action: Add <meta name="description" content="...">.
+ Favicon: Ensure 
+/vite.svg
+ is replaced with your actual logo (/src/logo.png or 
+App.ico
+ converted to web format) in 
+index.html
+.
+6. Performance
+ Lighthouse Audit: Run a Lighthouse audit in Chrome DevTools.
+Focus on Largest Contentful Paint (LCP). Your hero image/screenshot is the likely candidate. Consider adding loading="eager" to the hero image and loading="lazy" to the "Visual Usage Guide" images below the fold.

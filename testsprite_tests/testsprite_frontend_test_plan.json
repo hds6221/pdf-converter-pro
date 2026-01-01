@@ -1,0 +1,274 @@
+[
+  {
+    "id": "TC001",
+    "title": "Navbar responsiveness on mobile devices",
+    "description": "Verify the Navbar adapts correctly on mobile screen sizes with hidden buttons accessible via hamburger menu or alternatives.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Resize screen to typical mobile width (e.g. 375px width)."
+      },
+      {
+        "type": "assertion",
+        "description": "Check Navbar changes to mobile layout with hamburger menu visible."
+      },
+      {
+        "type": "action",
+        "description": "Click the hamburger menu."
+      },
+      {
+        "type": "assertion",
+        "description": "Validate that all navigation buttons are accessible within the expanded menu."
+      },
+      {
+        "type": "action",
+        "description": "Navigate using each menu item."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm navigation links lead to corresponding sections with correct scrolling behavior."
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Hero text correct wrapping on tablet screen widths",
+    "description": "Ensure hero section text wraps correctly without awkward line breaks or overflow on tablet widths between 600px and 768px.",
+    "category": "ui",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Resize viewport to tablet width e.g. 700px."
+      },
+      {
+        "type": "assertion",
+        "description": "Observe hero text wrapping behavior and verify absence of awkward breaks or overflow."
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Feature grid layout responsiveness",
+    "description": "Validate that the features grid adjusts column counts correctly for different screen widths, including when the number of feature items is uneven.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Set screen width to small (e.g. 500px)."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm features are displayed in single column layout."
+      },
+      {
+        "type": "action",
+        "description": "Set screen width to medium (600px - 768px)."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm features are displayed in an appropriate two-column layout with proper alignment."
+      },
+      {
+        "type": "action",
+        "description": "Set screen width to desktop (e.g. 1024px or larger)."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm features are displayed using default multi-column grid ensuring even spacing and alignment."
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Validate image asset paths and optimized loading",
+    "description": "Check that all image assets (screenshots, usage steps) load successfully without 404 errors and file sizes are optimized under 500KB.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load the landing page."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all images appear as expected with no broken links."
+      },
+      {
+        "type": "action",
+        "description": "Use browser devtools to inspect image network requests."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm file sizes for images are less than or equal to 500KB."
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Accessibility validation of image alt texts",
+    "description": "Validate that all images on the landing page have descriptive alt texts to meet accessibility standards.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Inspect every image element on the page."
+      },
+      {
+        "type": "assertion",
+        "description": "Check each image has a non-empty, descriptive alt attribute."
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Smooth scrolling navigation functionality",
+    "description": "Test navigation links that scroll to page sections perform smooth scrolling with scroll-padding preventing navbar overlap.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Click each internal navigation link from the Navbar and other navigational components."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm page scrolls smoothly to the target section."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify each target section heading is visible and not obscured by the fixed navbar."
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "External links correctness validation",
+    "description": "Verify all external links, especially the Download button's GitHub URL and footer support links, point to the correct URLs and open as expected.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Click the Download button."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm redirection to the latest GitHub release URL."
+      },
+      {
+        "type": "action",
+        "description": "Click each support/contact footer link."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify each link directs to the appropriate external resource or contact method."
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Version constants centralized usage",
+    "description": "Check that all version strings displayed on the site (e.g. hero badge) reference a single constants file ensuring consistency.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Inspect code or run tests to retrieve version strings displayed on the UI."
+      },
+      {
+        "type": "assertion",
+        "description": "Compare version strings to confirm they all match the centralized constant file."
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "SEO elements correctness",
+    "description": "Confirm that SEO elements such as <title>, <meta name=\"description\">, and favicon are correctly set in the HTML head.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "View page source or use devtools to inspect the <head> section."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify page <title> matches expected SEO title."
+      },
+      {
+        "type": "assertion",
+        "description": "Check <meta name=\"description\"> is present and accurate."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm favicon is loaded and matches the expected replacement."
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Lighthouse audit for Largest Contentful Paint and image loading",
+    "description": "Execute Lighthouse audit on the landing page to assess page speed, especially LCP metric, and identify image loading strategy effectiveness such as lazy loading below the fold.",
+    "category": "performance",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Run Lighthouse audit targeting performance metrics including LCP."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify LCP score meets performance targets or document improvement suggestions."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm below-the-fold images are lazy loaded or appropriately optimized."
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Keyboard navigation accessibility support",
+    "description": "Validate that the entire website, especially navigation elements and interactive controls, supports keyboard navigation and focus visibility.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Use keyboard (Tab, Shift+Tab, Enter) to navigate through all interactive page elements."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm all links, buttons, and menus are accessible and usable via keyboard only."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify visible focus indicators are present on active/focused elements."
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Footer links validation",
+    "description": "Check all links in the footer section are operational, point to correct destinations, and are visually consistent.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Click each link in the footer."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure each link navigates to the intended page or resource without errors."
+      }
+    ]
+  }
+]

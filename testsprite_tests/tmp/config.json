@@ -1,0 +1,16 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:5173",
+  "executionArgs": {
+    "projectName": "pdf_auto_web",
+    "projectPath": "/Users/hwangdaeseon/Desktop/pdf_auto (2)/pdf_auto/pdf_auto_web",
+    "testIds": [],
+    "additionalInstruction": "Verify that the UI implements the Dark Modern theme (dark background, neon accents) and the 4-step process guide is visible and responsive.",
+    "envs": {
+      "API_KEY": "sk-user-g9QHu4HKxO-n2aMQwroKUoN6w2tc8ANTylolI5lnDd48QLS2deLLGtwU8Rrdy2veYlFIVgl24uiWtk7Zhe2cXT_0sRgitrHMf_KWQUPkrcOp88ybzaJQQ3YXaxD13j0kPNI"
+    }
+  },
+  "proxy": "http://3f164f1c-0766-4b8f-a758-b495c403dbc8:p9NYxkK1GwL2XE8LoynHhQkrLZ2DExUF@tun.testsprite.com:8080"
+}
