@@ -1,0 +1,367 @@
+[
+  {
+    "id": "TC001",
+    "title": "Verify IntroOverlay animation on page load",
+    "description": "Ensure that the IntroOverlay component animates in on app load and animates out smoothly, then disappears fully leaving the main page visible.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load the application in a browser."
+      },
+      {
+        "type": "assertion",
+        "description": "Observe IntroOverlay animation starts immediately on load."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm IntroOverlay animates out smoothly after initial display."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that IntroOverlay is removed from the DOM, leaving main page content visible without flash or errors."
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Open InquiryBoard overlay from main page",
+    "description": "Test that clicking '고객 문의' button opens the InquiryBoard overlay properly with correct z-index layering above main content.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Wait for IntroOverlay to disappear after page load."
+      },
+      {
+        "type": "action",
+        "description": "Click on the '고객 문의' navigation button."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm that the InquiryBoard overlay appears above all other content and overlays backgrounds properly."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify overlay has correct z-index stacking, blocking underlying page interactions."
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Create new public inquiry successfully",
+    "description": "Verify that a normal user can open inquiry form, submit a new public inquiry, and see the list updated immediately with form cleared.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open InquiryBoard overlay."
+      },
+      {
+        "type": "action",
+        "description": "Click '문의하기' to open the new inquiry form."
+      },
+      {
+        "type": "action",
+        "description": "Fill in inquiry title, body, and submit without enabling secret toggle."
+      },
+      {
+        "type": "action",
+        "description": "Submit the inquiry form."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the new inquiry shows at the top of the inquiry list."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm that the form input fields are cleared after submission."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no React warnings or errors in console during submission."
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Create new secret inquiry and require password for viewing",
+    "description": "Verify that a user can post a secret inquiry, and normal users are prompted for password to view details.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open InquiryBoard overlay and open new inquiry form."
+      },
+      {
+        "type": "action",
+        "description": "Fill in inquiry title and body, enable secret toggle, set inquiry password, then submit."
+      },
+      {
+        "type": "action",
+        "description": "Attempt to open the posted secret inquiry item from normal user mode."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that a custom modal prompts for the secret password."
+      },
+      {
+        "type": "action",
+        "description": "Enter incorrect password and attempt to view details."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm access is denied and an error message is shown."
+      },
+      {
+        "type": "action",
+        "description": "Enter correct password and submit."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify inquiry details and any replies are displayed correctly."
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Admin user can bypass secret inquiry password",
+    "description": "Verify that when admin toggle mode is ON, admin users can view secret inquiries without password prompt.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Toggle admin mode ON in InquiryBoard."
+      },
+      {
+        "type": "action",
+        "description": "Click on a secret inquiry item from the inquiry list."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the inquiry details and replies are displayed immediately without password prompt."
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Admin user can post replies to inquiries",
+    "description": "Verify admin can toggle admin mode, open an inquiry, post reply, and see reply appear instantly in inquiry detail.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Toggle admin mode ON."
+      },
+      {
+        "type": "action",
+        "description": "Open any inquiry detail."
+      },
+      {
+        "type": "action",
+        "description": "Enter reply text in reply form and submit."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify reply appears in inquiry detail immediately."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm a visible badge or visual indicator of the reply is shown."
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Admin can delete inquiries and list updates",
+    "description": "Verify admin mode allows deleting inquiries and inquiry list updates reflecting deletion instantly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Toggle admin mode ON."
+      },
+      {
+        "type": "action",
+        "description": "Select an inquiry to delete from the list."
+      },
+      {
+        "type": "action",
+        "description": "Click the delete button and confirm deletion via custom modal."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the inquiry is removed from the list immediately."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm no React warnings or errors in the console."
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Responsive layout adapts from desktop to mobile",
+    "description": "Verify InquiryBoard inquiry list and detail components split side-by-side on desktop and stack vertically in mobile viewport.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open InquiryBoard on a desktop resolution (>= 1024px wide)."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify inquiry list and inquiry detail are displayed side-by-side."
+      },
+      {
+        "type": "action",
+        "description": "Resize viewport to mobile size (< 640px width)."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm inquiry list and detail stack vertically."
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Native dialogs replaced with custom modal dialogs",
+    "description": "Verify all native alert, prompt, and confirm dialogs for password input, deletion confirmations, and error messages are replaced with styled custom modal components.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Trigger password prompt by opening secret inquiry as normal user."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm native prompt dialog is not shown; custom modal is displayed for password entry instead."
+      },
+      {
+        "type": "action",
+        "description": "Trigger a deletion confirmation as admin."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify custom confirm modal is shown, not native confirm dialog."
+      },
+      {
+        "type": "action",
+        "description": "Trigger validation error by submitting empty inquiry form."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm error message is displayed in custom modal or inline validation, no native alert used."
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Check for no React key warnings or invalid props in console",
+    "description": "Verify that during inquiry list rendering, inquiry creation, and admin operations there are no React key warnings or invalid DOM property warnings in browser console.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Perform multiple inquiry creations and deletions."
+      },
+      {
+        "type": "action",
+        "description": "Switch between admin and user modes and open inquiry details."
+      },
+      {
+        "type": "assertion",
+        "description": "Monitor browser console for no React warnings related to keys or invalid props."
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Network requests to backend return status 200 and consistent data",
+    "description": "Verify all API interactions with the mock backend endpoint /inquiries via axios return HTTP 200 status and response data matches UI inquiry list and details.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open InquiryBoard and load inquiry list."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify GET /inquiries returns HTTP 200 with inquiry data matching UI list."
+      },
+      {
+        "type": "action",
+        "description": "Create a new inquiry and observe POST request."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm POST /inquiries returns HTTP 200 and new inquiry data reflects in response."
+      },
+      {
+        "type": "action",
+        "description": "Admin replies to an inquiry and DELETE an inquiry."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify PUT/DELETE requests return HTTP 200 and UI updates accordingly."
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Verify inquiry list container handles overflow with smooth scrolling",
+    "description": "Ensure that the inquiry list container has proper CSS overflow handling and scrolls smoothly when the list exceeds container height on both desktop and mobile layouts.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Populate inquiry list with enough inquiries to exceed container height."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that inquiry list container scrolls vertically without layout breaking."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify smooth scroll animations and no jitter or flicker during scroll."
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Close InquiryBoard overlay returns to main landing page",
+    "description": "Verify the InquiryBoard overlay closes properly when the close button is clicked, returning user back to the main landing page with no residual overlays or UI artifacts.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open InquiryBoard overlay."
+      },
+      {
+        "type": "action",
+        "description": "Click the close button on the InquiryBoard overlay."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the overlay disappears and main landing page content is fully interactive."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify z-index layering resets properly with no hidden overlay elements."
+      }
+    ]
+  }
+]

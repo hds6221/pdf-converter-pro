@@ -1,0 +1,50 @@
+ackend Debugging Checklist (json-server)
+Since the "backend" is a lightweight json-server verifying 
+db.json
+, debugging focuses on the process state, data file integrity, and HTTP connectivity.
+
+1. Process & Port Verification
+ Terminal Check:
+Ensure npm run dev:full is running.
+Look for "Hi!" or "Runnning on http://localhost:3001" in the terminal output.
+Issue Sign: If you see EADDRINUSE: 3001, an old process is stuck.
+Fix: kill $(lsof -t -i:3001)
+ Port Status:
+Check if port 3001 is listening: lsof -i :3001
+Check response manually: curl -I http://localhost:3001/inquiries
+Expected: HTTP/1.1 200 OK (or similar).
+If Connection refused: Server is down.
+If Empty reply from server: Process exists but is hanging/crashing (Critical issue found during TestSprite).
+2. Data Integrity (
+db.json
+)
+ JSON Syntax:
+Open 
+db.json
+.
+Ensure it is valid JSON (no trailing commas, all keys quoted).
+Structure: It must start with an object, e.g., { "inquiries": [ ... ] }. If it is an array [...] at the root, json-server usage differs.
+ Write Permissions:
+Ensure the file is not Read-Only.
+Ensure the user running npm has write access to the folder.
+3. Data Consistency & Logic
+ ID Conflicts: json-server usually handles string/number IDs. Ensure manual edits haven't introduced duplicate IDs.
+ Empty State:
+If 
+db.json
+ is { "inquiries": [] }, GET request should return [] (200 OK), not 404.
+4. API Testing Commands (Manual)
+Run these in a separate terminal to isolate backend from frontend issues.
+
+GET (Read):
+curl -v http://localhost:3001/inquiries
+POST (Create):
+curl -v -X POST -H "Content-Type: application/json" \
+  -d '{"title":"Test","content":"Debug","author":"Admin","isSecret":false,"createdAt":"2026-01-01","status":"pending"}' \
+  http://localhost:3001/inquiries
+DELETE (Remove):
+# Replace 'ID_HERE' with a real ID from the GET step
+curl -v -X DELETE http://localhost:3001/inquiries/ID_HERE
+5. Middleware/CORS Check
+json-server enables CORS by default.
+If requests fail from localhost:5173 (frontend) but pass from curl, it might be a browser-specific network restriction or mixed-content issue (unlikely on localhost).

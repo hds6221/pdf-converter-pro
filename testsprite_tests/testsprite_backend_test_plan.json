@@ -1,0 +1,27 @@
+[
+  {
+    "id": "TC001",
+    "title": "post_new_inquiry",
+    "description": "Test the API endpoint for posting a new inquiry. Verify that the inquiry is created successfully, the inquiry list updates immediately with the new post at the top, and the form fields are cleared after submission."
+  },
+  {
+    "id": "TC002",
+    "title": "get_inquiry_details_with_password_validation",
+    "description": "Test the API endpoint for retrieving inquiry details. For secret inquiries, verify that password authentication is required for normal users and that the correct password grants access. Confirm that admin users can bypass password authentication and access details directly."
+  },
+  {
+    "id": "TC003",
+    "title": "admin_reply_to_inquiry",
+    "description": "Test the API endpoint for admin users to reply to an inquiry. Verify that the reply is saved correctly, the inquiry list updates to show the reply badge, and the reply is visible in the inquiry details."
+  },
+  {
+    "id": "TC004",
+    "title": "admin_delete_inquiry",
+    "description": "Test the API endpoint for admin users to delete an inquiry. Verify that the inquiry is removed from the list, the UI updates accordingly, and no errors occur."
+  },
+  {
+    "id": "TC005",
+    "title": "get_inquiry_list",
+    "description": "Test the API endpoint for retrieving the list of inquiries. Verify that the list returns all inquiries with correct data, including secret flags and reply status, and that the data is consistent with the UI display."
+  }
+]

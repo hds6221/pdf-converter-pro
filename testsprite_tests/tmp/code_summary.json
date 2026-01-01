@@ -1,0 +1,40 @@
+{
+    "tech_stack": [
+        "TypeScript",
+        "React",
+        "Vite",
+        "TailwindCSS",
+        "Framer Motion",
+        "Axios"
+    ],
+    "features": [
+        {
+            "name": "IntroOverlay",
+            "description": "Intro animation overlay that displays before the main content.",
+            "files": [
+                "src/components/IntroOverlay.tsx"
+            ]
+        },
+        {
+            "name": "InquiryBoard",
+            "description": "Customer support board allowing users to post inquiries, view details, and admin management (reply, delete). Supports secret posts.",
+            "files": [
+                "src/components/InquiryBoard.tsx"
+            ]
+        },
+        {
+            "name": "App",
+            "description": "Main application entry point containing the landing page, navigation, features section, and layout structure.",
+            "files": [
+                "src/App.tsx"
+            ]
+        },
+        {
+            "name": "Backend Configuration",
+            "description": "Mock backend data structure for inquiries.",
+            "files": [
+                "db.json"
+            ]
+        }
+    ]
+}

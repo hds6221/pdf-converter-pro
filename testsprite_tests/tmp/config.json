@@ -1,0 +1,17 @@
+{
+  "status": "commited",
+  "type": "backend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3001",
+  "backendAuthType": "public",
+  "executionArgs": {
+    "projectName": "pdf_auto_web",
+    "projectPath": "/Users/hwangdaeseon/Desktop/pdf_auto (2)/pdf_auto/pdf_auto_web",
+    "testIds": [],
+    "additionalInstruction": "Test the Backend API running at http://localhost:3001/inquiries.\n1. **GET**: Verify it returns a list (200 OK).\n2. **POST**: Create a new inquiry with title \"TestSprite Backend Test\". Verify 201 Created and data is correct.\n3. **GET (ID)**: Fetch the created inquiry by ID.\n4. **DELETE**: Delete the created inquiry. Verify 200/204 OK.\n5. **Verify**: Check that the deleted item is gone.\nThis works against a standard json-server.",
+    "envs": {
+      "API_KEY": "sk-user-g9QHu4HKxO-n2aMQwroKUoN6w2tc8ANTylolI5lnDd48QLS2deLLGtwU8Rrdy2veYlFIVgl24uiWtk7Zhe2cXT_0sRgitrHMf_KWQUPkrcOp88ybzaJQQ3YXaxD13j0kPNI"
+    }
+  },
+  "proxy": "http://a78acac8-4fcd-4e35-b46f-f51a34129223:BYpNycTrO036mmr4ui3r9tuFBOcvKvCk@tun.testsprite.com:8080"
+}
