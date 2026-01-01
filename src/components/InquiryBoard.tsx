@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Lock, Plus, CheckCircle, Shield, ShieldCheck, BookOpen, AlertTriangle, MessageSquare } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useModal } from '../hooks/useModal';
 
 // Interfaces for Type Safety (Supabase Schema Match)
 interface Inquiry {
@@ -17,6 +18,7 @@ interface Inquiry {
 }
 
 const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; adminEntry?: boolean }) => {
+    const { showAlert, showConfirm, showPrompt } = useModal();
     const [inquiries, setInquiries] = useState<Inquiry[]>([]);
     const [isAdmin, setIsAdmin] = useState(false);
     const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -131,9 +133,9 @@ const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; ad
             setIsWriteMode(false);
             resetForm();
             fetchInquiries();
-            alert('문의가 정상적으로 등록되었습니다! (확인)'); // Success Alert
+            await showAlert('문의가 정상적으로 등록되었습니다! (확인)'); // Success Alert
         } catch (error: any) {
-            alert('문의 등록 실패: ' + (error.message || '알 수 없는 오류'));
+            await showAlert('문의 등록 실패: ' + (error.message || '알 수 없는 오류'));
             console.error(error);
         }
     };
@@ -153,14 +155,14 @@ const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; ad
             setReplyContent('');
             fetchInquiries();
         } catch (error) {
-            alert('답변 등록 실패');
+            await showAlert('답변 등록 실패');
             console.error(error);
         }
     };
 
     const handleDeleteReply = async () => {
         if (!selectedInquiry) return;
-        if (!confirm('정말 답변을 삭제하시겠습니까?')) return;
+        if (!await showConfirm('정말 답변을 삭제하시겠습니까?')) return;
 
         try {
             const { error } = await supabase
@@ -174,7 +176,7 @@ const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; ad
             setSelectedInquiry(updated);
             fetchInquiries();
         } catch (error) {
-            alert('답변 삭제 실패');
+            await showAlert('답변 삭제 실패');
             console.error(error);
         }
     };
@@ -183,11 +185,11 @@ const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; ad
         if (!selectedInquiry) return;
 
         if (isAdmin) {
-            if (!confirm('관리자 권한으로 삭제하시겠습니까?')) return;
+            if (!await showConfirm('관리자 권한으로 삭제하시겠습니까?')) return;
         } else {
-            const inputPwd = prompt('삭제하려면 비밀번호를 입력해주세요.');
+            const inputPwd = await showPrompt('삭제하려면 비밀번호를 입력해주세요.', { isSecret: true });
             if (inputPwd !== selectedInquiry.password) {
-                alert('비밀번호가 일치하지 않습니다.');
+                await showAlert('비밀번호가 일치하지 않습니다.');
                 return;
             }
         }
@@ -199,7 +201,7 @@ const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; ad
             setSelectedInquiry(null);
             fetchInquiries();
         } catch (error) {
-            alert('삭제 실패');
+            await showAlert('삭제 실패');
             console.error(error);
         }
     };
@@ -237,11 +239,11 @@ const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; ad
         setIsSecret(false);
     };
 
-    const handleInquiryClick = (inquiry: Inquiry) => {
+    const handleInquiryClick = async (inquiry: Inquiry) => {
         if (inquiry.is_secret && !isAdmin) {
-            const inputPwd = prompt('비밀글입니다. 비밀번호를 입력해주세요.');
+            const inputPwd = await showPrompt('비밀글입니다. 비밀번호를 입력해주세요.', { isSecret: true });
             if (inputPwd !== inquiry.password) {
-                alert('비밀번호가 일치하지 않습니다.');
+                await showAlert('비밀번호가 일치하지 않습니다.');
                 return;
             }
         }

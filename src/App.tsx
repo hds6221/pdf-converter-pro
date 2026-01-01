@@ -13,8 +13,10 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import IntroOverlay from './components/IntroOverlay';
 import InquiryBoard from './components/InquiryBoard';
+import { useModal } from './hooks/useModal';
 
 const App = () => {
+    const { showAlert } = useModal();
     const [showIntro, setShowIntro] = useState(true);
     const [showSupport, setShowSupport] = useState(false);
     const adminEntry =
@@ -32,7 +34,7 @@ const App = () => {
         const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         if (isMobile) {
             event.preventDefault();
-            alert('모바일에서는 다운로드가 불가합니다. PC에서 다운로드해주세요.');
+            showAlert('모바일에서는 다운로드가 불가합니다. \nPC에서 다운로드해주세요.', { title: '다운로드 안내' });
         }
     };
 
