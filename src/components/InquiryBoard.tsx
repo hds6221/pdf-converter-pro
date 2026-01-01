@@ -16,12 +16,19 @@ interface Inquiry {
     reply: string | null;
 }
 
-const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
+const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; adminEntry?: boolean }) => {
     const [inquiries, setInquiries] = useState<Inquiry[]>([]);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
     const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
     const [isWriteMode, setIsWriteMode] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [authLoading, setAuthLoading] = useState(true);
+    const [showAdminLogin, setShowAdminLogin] = useState(false);
+    const [adminEmail, setAdminEmail] = useState('');
+    const [adminPassword, setAdminPassword] = useState('');
+    const [adminError, setAdminError] = useState('');
 
     // Form States
     const [newTitle, setNewTitle] = useState('');
@@ -35,7 +42,62 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
 
     useEffect(() => {
         fetchInquiries();
+        loadSession();
+        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+            const email = session?.user?.email ?? null;
+            const id = session?.user?.id ?? null;
+            setUserEmail(email);
+            setUserId(id);
+            checkAdmin(id);
+        });
+        return () => {
+            authListener.subscription.unsubscribe();
+        };
     }, []);
+
+    useEffect(() => {
+        if (adminEntry && !authLoading && !userEmail) {
+            setShowAdminLogin(true);
+        }
+    }, [adminEntry, authLoading, userEmail]);
+
+    const loadSession = async () => {
+        try {
+            const { data, error } = await supabase.auth.getSession();
+            if (error) throw error;
+            const email = data.session?.user?.email ?? null;
+            const id = data.session?.user?.id ?? null;
+            setUserEmail(email);
+            setUserId(id);
+            await checkAdmin(id);
+        } catch (error) {
+            console.error('Failed to load session', error);
+            setUserEmail(null);
+            setUserId(null);
+            setIsAdmin(false);
+        } finally {
+            setAuthLoading(false);
+        }
+    };
+
+    const checkAdmin = async (id: string | null) => {
+        if (!id) {
+            setIsAdmin(false);
+            return;
+        }
+        try {
+            const { data, error } = await supabase
+                .from('admins')
+                .select('user_id')
+                .eq('user_id', id)
+                .maybeSingle();
+            if (error) throw error;
+            setIsAdmin(!!data);
+        } catch (error) {
+            console.error('Failed to check admin', error);
+            setIsAdmin(false);
+        }
+    };
 
     const fetchInquiries = async () => {
         try {
@@ -46,8 +108,9 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
 
             if (error) throw error;
             setInquiries(data || []);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to fetch inquiries', error);
+            // alert('목록 불러오기 실패: ' + (error.message || '오류')); // Only enable if debugging needed
         } finally {
             setLoading(false);
         }
@@ -72,6 +135,7 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
             setIsWriteMode(false);
             resetForm();
             fetchInquiries();
+            alert('문의가 정상적으로 등록되었습니다! (확인)'); // Success Alert
         } catch (error: any) {
             alert('문의 등록 실패: ' + (error.message || '알 수 없는 오류'));
             console.error(error);
@@ -144,6 +208,31 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
         }
     };
 
+    const handleAdminLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setAdminError('');
+        try {
+            const { error } = await supabase.auth.signInWithPassword({
+                email: adminEmail,
+                password: adminPassword
+            });
+            if (error) throw error;
+            setShowAdminLogin(false);
+            setAdminEmail('');
+            setAdminPassword('');
+        } catch (error: any) {
+            setAdminError(error.message || '로그인 실패');
+        }
+    };
+
+    const handleAdminLogout = async () => {
+        try {
+            await supabase.auth.signOut();
+        } catch (error) {
+            console.error('Failed to sign out', error);
+        }
+    };
+
     const resetForm = () => {
         setNewTitle('');
         setNewContent('');
@@ -176,12 +265,28 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
                 <div className="flex justify-between items-center mb-10">
                     <div className="flex items-center gap-4">
                         <h2 className="text-3xl font-bold text-white">고객 문의 센터</h2>
-                        <button
-                            onClick={() => setIsAdmin(!isAdmin)}
-                            className={`px-3 py-1 rounded text-xs font-bold border transition-colors ${isAdmin ? 'bg-[#66FCF1] text-[#0B0C10] border-[#66FCF1]' : 'border-slate-700 text-slate-500 hover:text-white'}`}
-                        >
-                            {isAdmin ? <div className="flex items-center gap-1"><ShieldCheck size={14} /> ADMIN ON</div> : <div className="flex items-center gap-1"><Shield size={14} /> ADMIN OFF</div>}
-                        </button>
+                        {authLoading && (adminEntry || userEmail) ? (
+                            <div className="px-3 py-1 rounded text-xs font-bold border border-slate-700 text-slate-500">AUTH...</div>
+                        ) : userEmail ? (
+                            <div className="flex items-center gap-2">
+                                <div className={`px-3 py-1 rounded text-xs font-bold border ${isAdmin ? 'bg-[#66FCF1] text-[#0B0C10] border-[#66FCF1]' : 'border-slate-700 text-slate-500'}`}>
+                                    {isAdmin ? <div className="flex items-center gap-1"><ShieldCheck size={14} /> ADMIN</div> : <div className="flex items-center gap-1"><Shield size={14} /> USER</div>}
+                                </div>
+                                <button
+                                    onClick={handleAdminLogout}
+                                    className="px-3 py-1 rounded text-xs font-bold border border-slate-700 text-slate-400 hover:text-white"
+                                >
+                                    로그아웃
+                                </button>
+                            </div>
+                        ) : adminEntry ? (
+                            <button
+                                onClick={() => { setShowAdminLogin(true); setAdminError(''); }}
+                                className="px-3 py-1 rounded text-xs font-bold border border-slate-700 text-slate-500 hover:text-white"
+                            >
+                                관리자 로그인
+                            </button>
+                        ) : null}
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-[#1F2833] rounded-full transition-colors">
                         <X className="w-8 h-8 text-slate-400 hover:text-white" />
@@ -472,6 +577,48 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
                     )}
                 </div>
             </div>
+
+            {showAdminLogin && (
+                <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 px-6">
+                    <div className="w-full max-w-md rounded-2xl border border-[#45A29E]/20 bg-[#0B0C10] p-6 shadow-xl">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold text-white">관리자 로그인</h3>
+                            <button onClick={() => setShowAdminLogin(false)} className="p-1 hover:bg-[#1F2833] rounded">
+                                <X className="w-5 h-5 text-slate-400 hover:text-white" />
+                            </button>
+                        </div>
+                        <form onSubmit={handleAdminLogin} className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-400">이메일</label>
+                                <input
+                                    type="email" required
+                                    value={adminEmail} onChange={e => setAdminEmail(e.target.value)}
+                                    placeholder="admin@example.com"
+                                    className="w-full bg-[#0B0C10] border border-slate-700 rounded-lg p-3 text-white focus:border-[#66FCF1] focus:outline-none placeholder:text-slate-600"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-400">비밀번호</label>
+                                <input
+                                    type="password" required
+                                    value={adminPassword} onChange={e => setAdminPassword(e.target.value)}
+                                    placeholder="비밀번호"
+                                    className="w-full bg-[#0B0C10] border border-slate-700 rounded-lg p-3 text-white focus:border-[#66FCF1] focus:outline-none placeholder:text-slate-600"
+                                />
+                            </div>
+                            {adminError && (
+                                <div className="text-xs text-red-400">{adminError}</div>
+                            )}
+                            <button
+                                type="submit"
+                                className="w-full bg-[#66FCF1] hover:bg-[#45A29E] text-[#0B0C10] font-bold py-3 rounded-lg transition-colors shadow-lg shadow-[#66FCF1]/20"
+                            >
+                                로그인
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </motion.div>
     );
 };

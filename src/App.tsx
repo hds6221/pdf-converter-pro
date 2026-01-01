@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Download,
     FileText,
@@ -17,6 +17,24 @@ import InquiryBoard from './components/InquiryBoard';
 const App = () => {
     const [showIntro, setShowIntro] = useState(true);
     const [showSupport, setShowSupport] = useState(false);
+    const adminEntry =
+        typeof window !== 'undefined' &&
+        (window.location.hash === '#admin' || new URLSearchParams(window.location.search).get('admin') === '1');
+
+    useEffect(() => {
+        if (adminEntry) {
+            setShowIntro(false);
+            setShowSupport(true);
+        }
+    }, [adminEntry]);
+
+    const handleDownloadClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isMobile) {
+            event.preventDefault();
+            alert('모바일에서는 다운로드가 불가합니다. PC에서 다운로드해주세요.');
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#0B0C10] text-slate-200 relative overflow-hidden font-sans selection:bg-[#66FCF1] selection:text-[#0B0C10]">
@@ -25,7 +43,7 @@ const App = () => {
                     <IntroOverlay onComplete={() => setShowIntro(false)} />
                 )}
                 {showSupport && (
-                    <InquiryBoard onClose={() => setShowSupport(false)} />
+                    <InquiryBoard onClose={() => setShowSupport(false)} adminEntry={adminEntry} />
                 )}
             </AnimatePresence>
 
@@ -58,7 +76,7 @@ const App = () => {
                                     <a href="#features" className="text-slate-400 hover:text-[#66FCF1] text-sm font-semibold transition-all hover:glow-text">기능 소개</a>
                                     <a href="#guide" className="text-slate-400 hover:text-[#66FCF1] text-sm font-semibold transition-all hover:glow-text">이용 방법</a>
                                     <button onClick={() => setShowSupport(true)} className="text-slate-400 hover:text-[#66FCF1] text-sm font-semibold transition-all hover:glow-text">고객 문의</button>
-                                    <a href="/PDF_Converter_Pro_Installer.exe" download
+                                    <a href="/PDF_Converter_Pro_Installer.exe" download onClick={handleDownloadClick}
                                         className="bg-[#1F2833] hover:bg-[#45A29E] text-[#66FCF1] hover:text-white border border-[#45A29E]/50 px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg hover:shadow-[#66FCF1]/40 hover:-translate-y-0.5"
                                     >
                                         다운로드
@@ -91,6 +109,7 @@ const App = () => {
                             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                                 <a
                                     href="/PDF_Converter_Pro_Installer.exe" download
+                                    onClick={handleDownloadClick}
                                     className="w-full sm:w-auto px-10 py-4 bg-[#66FCF1] hover:bg-[#45A29E] text-[#0B0C10] rounded-xl font-bold text-lg shadow-[0_0_20px_rgba(102,252,241,0.4)] hover:shadow-[0_0_30px_rgba(102,252,241,0.6)] transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3"
                                 >
                                     <Download className="w-5 h-5" />
@@ -228,9 +247,10 @@ const App = () => {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setShowSupport(true)}
-                        className="md:hidden fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#66FCF1] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(102,252,241,0.4)] text-[#0B0C10]"
+                        className="md:hidden fixed bottom-6 right-6 z-50 h-14 px-4 bg-[#66FCF1] rounded-full flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(102,252,241,0.4)] text-[#0B0C10] font-bold"
                     >
                         <MessageSquare className="w-6 h-6 fill-current" />
+                        <span className="text-sm">문의</span>
                     </motion.button>
                 </motion.div>
             )}
