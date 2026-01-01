@@ -20,7 +20,6 @@ const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; ad
     const [inquiries, setInquiries] = useState<Inquiry[]>([]);
     const [isAdmin, setIsAdmin] = useState(false);
     const [userEmail, setUserEmail] = useState<string | null>(null);
-    const [userId, setUserId] = useState<string | null>(null);
     const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
     const [isWriteMode, setIsWriteMode] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -47,7 +46,6 @@ const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; ad
             const email = session?.user?.email ?? null;
             const id = session?.user?.id ?? null;
             setUserEmail(email);
-            setUserId(id);
             checkAdmin(id);
         });
         return () => {
@@ -68,12 +66,10 @@ const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; ad
             const email = data.session?.user?.email ?? null;
             const id = data.session?.user?.id ?? null;
             setUserEmail(email);
-            setUserId(id);
             await checkAdmin(id);
         } catch (error) {
             console.error('Failed to load session', error);
             setUserEmail(null);
-            setUserId(null);
             setIsAdmin(false);
         } finally {
             setAuthLoading(false);
