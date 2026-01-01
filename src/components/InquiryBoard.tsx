@@ -187,7 +187,7 @@ const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; ad
         if (isAdmin) {
             if (!await showConfirm('관리자 권한으로 삭제하시겠습니까?')) return;
         } else {
-            const inputPwd = await showPrompt('삭제하려면 비밀번호를 입력해주세요.', { isSecret: true });
+            const inputPwd = await showPrompt('삭제하려면 비밀번호를 입력해주세요.', { isSecret: true, title: '비밀번호 확인' });
             if (inputPwd !== selectedInquiry.password) {
                 await showAlert('비밀번호가 일치하지 않습니다.');
                 return;
@@ -241,7 +241,7 @@ const InquiryBoard = ({ onClose, adminEntry = false }: { onClose: () => void; ad
 
     const handleInquiryClick = async (inquiry: Inquiry) => {
         if (inquiry.is_secret && !isAdmin) {
-            const inputPwd = await showPrompt('비밀글입니다. 비밀번호를 입력해주세요.', { isSecret: true });
+            const inputPwd = await showPrompt('비밀글입니다. 비밀번호를 입력해주세요.', { isSecret: true, title: '비밀번호 확인' });
             if (inputPwd !== inquiry.password) {
                 await showAlert('비밀번호가 일치하지 않습니다.');
                 return;

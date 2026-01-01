@@ -62,7 +62,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                 type: 'prompt',
                 message,
                 resolve,
-                title: options?.title || '입력',
+                title: options?.title || '입력 요청',
                 confirmText: options?.confirmText || '확인',
                 cancelText: options?.cancelText || '취소',
                 isSecret: options?.isSecret || false,
