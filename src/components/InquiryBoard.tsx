@@ -72,8 +72,8 @@ const InquiryBoard = ({ onClose }: { onClose: () => void }) => {
             setIsWriteMode(false);
             resetForm();
             fetchInquiries();
-        } catch (error) {
-            alert('문의 등록에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        } catch (error: any) {
+            alert('문의 등록 실패: ' + (error.message || '알 수 없는 오류'));
             console.error(error);
         }
     };
