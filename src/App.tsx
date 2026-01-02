@@ -78,7 +78,7 @@ const App = () => {
                                     <a href="#features" className="text-slate-400 hover:text-[#66FCF1] text-sm font-semibold transition-all hover:glow-text">기능 소개</a>
                                     <a href="#guide" className="text-slate-400 hover:text-[#66FCF1] text-sm font-semibold transition-all hover:glow-text">이용 방법</a>
                                     <button onClick={() => setShowSupport(true)} className="text-slate-400 hover:text-[#66FCF1] text-sm font-semibold transition-all hover:glow-text">고객 문의</button>
-                                    <a href="/PDF_Converter_Pro_Installer.exe" download onClick={handleDownloadClick}
+                                    <a href="/PDF_Converter_Pro_Installer_x64.exe" download onClick={handleDownloadClick}
                                         className="bg-[#1F2833] hover:bg-[#45A29E] text-[#66FCF1] hover:text-white border border-[#45A29E]/50 px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg hover:shadow-[#66FCF1]/40 hover:-translate-y-0.5"
                                     >
                                         다운로드
@@ -110,7 +110,7 @@ const App = () => {
 
                             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                                 <a
-                                    href="/PDF_Converter_Pro_Installer.exe" download
+                                    href="/PDF_Converter_Pro_Installer_x64.exe" download
                                     onClick={handleDownloadClick}
                                     className="w-full sm:w-auto px-10 py-4 bg-[#66FCF1] hover:bg-[#45A29E] text-[#0B0C10] rounded-xl font-bold text-lg shadow-[0_0_20px_rgba(102,252,241,0.4)] hover:shadow-[0_0_30px_rgba(102,252,241,0.6)] transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3"
                                 >
